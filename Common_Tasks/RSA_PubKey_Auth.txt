@@ -1,0 +1,43 @@
+hostname
+ip domain name cisco.com
+
+aaa new-model
+aaa authentication login default local
+aaa authorization exec default local 
+aaa authentication login SSH none
+ip scp server enable
+
+crypto key generate rsa modulus 2048 general-keys exportable
+line vty 0 4
+transport input ssh 
+login authentication SSH
+exit
+ip ssh version 2
+
+
+(ip ssh source-interface?)
+
+no ip ssh server algorithm authentication password
+no ip ssh server algorithm authentication keyboard
+ip ssh server algorithm authentication publickey
+username admin privilege 15 secret Cisco123
+do wr
+
+ip ssh pubkey-chain 
+        username admin
+        key-string
+            (fold -b -w 70 [Public_Key_of_remote_Machine_FILE_Location]
+            	(Paste the output into the Key-string prompt)
+        exit
+        exit
+        exit
+
+(Compare ssh fingerprint - Run on Linux machine that hosts pub file of remote PC) 
+        ssh-keygen -f Pub_Key -l
+        sh runn | i key
+
+Example: Copy running-config from router to local dir
+pscp -scp -l admin -i C:\Users\alexa\.ssh\id_rsa.ppk 10.10.2.2:system:running-config Routable_RSAPubKeyEnabled
+
+Example: Copy local config to cisco device startup-config
+pscp -scp -i C:\Users\alexa\.ssh\id_rsa.ppk -l admin "Routable_RSAPubKeyEnabled" 10.10.3.2:nvram:startup-config

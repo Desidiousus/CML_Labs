@@ -1,0 +1,280 @@
+! The holdtime value should be at least three times greater than the hello time.
+! The failover delay configuration should also take into account IGP convergence delay.
+! Configure the pre-empt delay timer so that pre-emption occurs after the HSRP device has 
+! fully rebooted and has established full connectivity to the network.
+    ! standby [group-number] timers [msec] hellotime [msec] holdtime 
+
+! When a pre-empting device is rebooted, HSRP pre-emption communication should not begin until
+! the distribution switch has established full connectivity to the rest of the network. 
+! This situation allows the routing protocol convergence to occur more quickly after the 
+! preferred router is in an active state. This helps if the active router hardware is end of life
+! cycle, and is starting to reboot over and over. Best practice - take router average boot time 
+! divided by two. The router must be alive/healthy for X number of seconds before HSRP fails back 
+! over.
+    ! standby 1 preempt delay minimum [seconds]
+
+! Tells the router to take over if the other standby router goes down.
+    ! standby [Group#] preempt
+
+! HSRP authentication prevents rogue Layer 3 devices on the network from joining the HSRP group.
+    ! standby 1 authentication md5 key-string VerySecretPassword55
+
+! To configure MD5 authentication using key chains, use the following command sequence:
+    ! Switch(config)# key chain chain-name
+    ! Switch(config-keychain)# key key-number
+    ! Switch(config-keychain-key)# key-string [0 | 7] string
+    ! Switch(config-keychain-key)# exit
+    ! Switch(config)# interface interface slot/number
+    ! Switch(config-if)# standby group authentication md5 key-chain chain-name
+
+! To enable HSRPv2 on all devices, use the following command in interface configuration mode:
+    ! Switch(config-if)# standby 10 version 2
+
+! Monitor the Router's Gateway interface. If the router interface goes down, failover to the other
+! HSRP enabled router by decrementing this router's HSRP priority by X.
+    ! standby [Group#] track [gateway_interface] [Decrement_Priority_By]
+    
+    ! You can track IP routes as well:
+        !(config)#track [TrackGroup#] ip route x.x.x.x/24 reachability
+        ! (config-track)#int [GatewayInterface]
+        ! (config-if)#standby [StandbyGroup#] track [TrackGroup#] decrement [Decrement_Priority_By]
+
+! HSRP authentication prevents rogue Layer 3 devices on the network from joining the HSRP group.
+! HSRP supports two authentication schemes:
+    ! Plaintext authentication
+    ! MD5 authentication (preferred)
+    ! To configure MD5 authentication, associate a key string with an interface.
+    ! The same authentication settings are required on all HSRP peers.
+        ! standby 13 authentication md5 key-string [Password]
+
+    ! Alternatively, you can define MD5 strings as keys on a key chain. 
+    ! This method is more flexible because you can define multiple keys 
+    ! with different validity times.
+        ! To configure MD5 authentication using key chains, use the following command sequence:
+        ! Switch(config)# key chain [chain-name]
+        ! Switch(config-keychain)# key key-number
+        ! Switch(config-keychain-key)# key-string [0 | 7] string
+        ! Switch(config-keychain-key)# exit
+        ! Switch(config)# interface interface slot/number
+        ! Switch(config-if)# standby group authentication md5 key-chain [chain-name]
+
+! There are two HSRP versions available on most Cisco routers and Layer 3 switches: 
+    ! HSRPv1 and HSRPv2.
+        ! standby 10 version [1/2]
+    ! HSRPv1
+        ! IPv4
+        ! Group numbers 0-255
+        ! Virtual MAC address: 0000:0C07:ACXX (The Xs stand in here for the HSRP group.)
+        ! Multicast Address: 224.0.0.2
+        ! Default version
+    ! HSRPv2
+        ! IPv4/IPv6
+        ! Group numbers 0-4095
+        ! Virtual MAC address: 0000:0C9F:FXXX (The Xs stand in here for the HSRP group.)
+        ! Multicast Address: 224.0.0.102
+
+! An HSRP router can be in one of five states:
+    ! show standby brief
+    ! show standby
+    ! Initial
+        ! The state at the start. Also, it is the state after a configuration change or when an 
+        ! interface first comes up.
+
+    ! Listen
+        ! The router knows the virtual IP address. It listens for hello messages from other routers.
+
+    ! Speak
+        ! The router sends periodic hello messages and actively participates in the election of the 
+        ! active or standby router.
+
+    ! Standby
+        ! The router is a candidate to become the next active router and sends periodic hello messages. 
+        ! With the exclusion of transient conditions, there is, at most, one router in the group in the 
+        ! standby state.
+
+    ! Active
+        ! The router currently forwards packets that are sent to the group virtual MAC address. 
+        ! The router sends periodic hello messages. With the exclusion of transient conditions, 
+        ! there must be, at most, one router in an active state in the group.
+
+! DR1 PC4
+  service password-encryption
+    interface port-channel 4
+    service instance 10 ethernet
+      encapsulation dot1q 10
+      description 10.10.2.64/27 - HR - Vlan 10
+      bridge-domain 10
+    exit
+  interface port-channel 4
+    service instance 11 ethernet
+      encapsulation dot1q 11
+      description 10.10.2.96/27 - Accounting - Vlan 11
+      bridge-domain 11
+    exit
+  interface port-channel 4
+    service instance 12 ethernet
+      encapsulation dot1q 12
+      description 10.10.2.128/27 - Legal - Vlan 12
+      bridge-domain 12
+    exit
+  interface port-channel 4
+    service instance 13 ethernet
+      encapsulation dot1q 13
+      description 10.10.2.160/27 - IT - Vlan 13
+      bridge-domain 13
+    exit
+  !!!!!!!!!!!!!!!!!!!!!!!!!
+  interface BDI10
+    ip address 10.10.2.66 255.255.255.224
+    encapsulation dot1q 10
+    standby 10 ip 10.10.2.65
+    standby 10 priority 110
+    standby 10 preempt
+    standby 10 track BDI10 20
+    standby 10 timers msec 200 msec 750 
+    standby 10 preempt delay minimum 350
+    standby 10 version 2
+    standby 10 authentication md5 key-string Cisco123
+    no shut
+    exit
+  !
+  interface BDI11
+    ip address 10.10.2.98 255.255.255.224
+    encapsulation dot1q 11
+    standby 11 ip 10.10.2.97
+    standby 11 priority 110
+    standby 11 preempt
+    standby 11 track BDI11 20
+    standby 11 timers msec 200 msec 750 
+    standby 11 preempt delay minimum 350
+    standby 11 version 2
+    standby 11 authentication md5 key-string Cisco123
+    no shut
+    exit
+  interface BDI12
+    ip address 10.10.2.130 255.255.255.224
+    encapsulation dot1q 12
+    standby 12 ip 10.10.2.129
+    standby 12 priority 100
+    standby 12 preempt
+    standby 12 track BDI12 20
+    standby 12 timers msec 200 msec 750 
+    standby 12 preempt delay minimum 350
+    standby 12 version 2
+    standby 12 authentication md5 key-string Cisco123
+    no shut
+    exit
+  !
+  interface BDI13
+    ip address 10.10.2.162 255.255.255.224
+    encapsulation dot1q 13
+    standby 13 ip 10.10.2.161
+    standby 13 priority 100
+    standby 13 preempt
+    standby 13 track BDI13 20
+    standby 13 timers msec 200 msec 750 
+    standby 13 preempt delay minimum 350
+    standby 13 version 2
+    standby 13 authentication md5 key-string Cisco123
+    no shut
+    exit    
+
+! DR2 PC4
+  service password-encryption
+    interface port-channel 4
+    service instance 10 ethernet
+      encapsulation dot1q 10
+      description 10.10.2.64/27 - HR - Vlan 10
+      bridge-domain 10
+    exit
+  interface port-channel 4
+    service instance 11 ethernet
+      encapsulation dot1q 11
+      description 10.10.2.96/27 - Accounting - Vlan 11
+      bridge-domain 11
+    exit
+  interface port-channel 4
+    service instance 12 ethernet
+      encapsulation dot1q 12
+      description 10.10.2.128/27 - Legal - Vlan 12
+      bridge-domain 12
+    exit
+  interface port-channel 4
+    service instance 13 ethernet
+      encapsulation dot1q 13
+      description 10.10.2.160/27 - IT - Vlan 13
+      bridge-domain 13
+    exit
+  !!!!!!!!!!!!!!!!!!!!!!!!!
+  interface BDI10
+    ip address 10.10.2.67 255.255.255.224
+    encapsulation dot1q 10
+    standby 10 ip 10.10.2.65
+    standby 10 priority 100
+    standby 10 preempt
+    standby 10 track BDI10 20
+    standby 10 timers msec 200 msec 750 
+    standby 10 preempt delay minimum 350
+    standby 10 version 2
+    standby 10 authentication md5 key-string Cisco123
+    ip helper-address 10.10.2.165
+    no shut
+    exit
+  !
+  interface BDI11
+    ip address 10.10.2.99 255.255.255.224
+    encapsulation dot1q 11
+    standby 11 ip 10.10.2.97
+    standby 11 priority 100
+    standby 11 preempt
+    standby 11 track BDI11 20
+    standby 11 timers msec 200 msec 750 
+    standby 11 preempt delay minimum 350
+    standby 11 version 2
+    standby 12 authentication md5 key-string Cisco123
+    ip helper-address 10.10.2.165
+    no shut
+    exit
+  interface BDI12
+    ip address 10.10.2.131 255.255.255.224
+    encapsulation dot1q 12
+    standby 12 ip 10.10.2.129
+    standby 12 priority 110
+    standby 12 preempt
+    standby 12 track BDI12 20
+    standby 12 timers msec 200 msec 750 
+    standby 12 preempt delay minimum 350
+    standby 12 version 2
+    standby 12 authentication md5 key-string Cisco123
+    ip helper-address 10.10.2.165
+    no shut
+    exit
+  !
+  interface BDI13
+    ip address 10.10.2.163 255.255.255.224
+    encapsulation dot1q 13
+    standby 13 ip 10.10.2.161
+    standby 13 priority 110
+    standby 13 preempt
+    standby 13 track BDI13 20
+    standby 13 timers msec 200 msec 750 
+    standby 13 preempt delay minimum 350
+    standby 13 version 2
+    standby 13 authentication md5 key-string Cisco123
+    ip helper-address 10.10.2.165
+    no shut
+    exit    
+
+
+! Alternatively, you can define MD5 strings as keys on a key chain. 
+! This method is more flexible because you can define multiple keys with different validity times.
+! To configure MD5 authentication using key chains, use the following command sequence:
+    ! Switch(config)# service password-encryption
+    ! Switch(config)# key chain chain-name
+    ! Switch(config-keychain)# key key-number
+    ! Switch(config-keychain-key)# key-string [0 | 7] string
+    ! Switch(config-keychain-key)# exit
+    ! Switch(config)# interface interface slot/number
+    ! Switch(config-if)# standby group authentication md5 key-chain chain-name
+
+

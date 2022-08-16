@@ -1,0 +1,488 @@
+
+!
+! Last configuration change at 00:28:09 EST Wed Jan 5 2022
+!
+version 17.3
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service call-home
+platform qfp utilization monitor load 80
+platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname DistRouter2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authentication login SSH none
+aaa authorization exec default local 
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone EST -5 0
+clock summer-time EDT recurring
+!
+!
+!
+!
+!
+!
+!
+ip domain name cisco.com
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-353425113
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-353425113
+ revocation-check none
+ rsakeypair TP-self-signed-353425113
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain TP-self-signed-353425113
+ certificate self-signed 01
+  3082032E 30820216 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 33353334 32353131 33301E17 0D323131 32323330 37313831 
+  335A170D 33313132 32333037 31383133 5A303031 2E302C06 03550403 1325494F 
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3335 33343235 
+  31313330 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 82010A02 
+  82010100 B0CBFD6C 7D939A05 6AF673FA F19C427E D8034EF2 95F4F1A8 AA0F22F2 
+  7A3ED378 F7F48DEF 8287C081 F3A39476 13761CE9 C6F70EAC 58CD4B7B 6EFF5327 
+  C682F0FA A1491929 D46321C9 FAE0EA35 D30886E0 D43C940B F48CBB02 34F91D50 
+  6652B22D 14F541B7 45C6608B 668FEE6A A021318F 3AE90ECC D808A9D2 3BFE1211 
+  4FC84FA5 CB32472E 091EBA35 B2ADAF14 244D852F EED7BE50 F6ABCE1C 705FE426 
+  B5AC5EDA 0F41B880 0C1B782F 1446247A 82A4FA46 2D679153 5B87F71D 2BAE902A 
+  6D36256B 4599F9DD E0946831 07104F94 46755BDE 401F129F 1BBF6B68 066B50A3 
+  81AA85CB B04DC6C0 3CF22333 929E7D8F 34DB39CA 0877FB52 12E816B7 45F3858C 
+  04186F43 02030100 01A35330 51300F06 03551D13 0101FF04 05300301 01FF301F 
+  0603551D 23041830 1680143A C0C008CB 18E7BFA5 CF60DF19 4BBF5AAA CD93FE30 
+  1D060355 1D0E0416 04143AC0 C008CB18 E7BFA5CF 60DF194B BF5AAACD 93FE300D 
+  06092A86 4886F70D 01010505 00038201 010073D0 7FCDCED8 3DFA6DE0 DFB2DF2E 
+  683E1DFA E313C859 4283139F 100FAE42 EE162A4F 91A53415 EA52F766 0C425C38 
+  578BC4C9 6EC5D5B5 17ABDB1C 10E90959 71C1AA0A 442FD1F5 F36C2D94 3B9F382D 
+  73298AC9 343F3DCF 82BAB674 647B14DC 24E0AF1E 6383240F A2435B46 5D16C89A 
+  DD84B8C3 67E1A532 05436238 F405434C 5CAD4708 19088CF6 02E6A965 ECBB6A66 
+  6B23BDC8 7A327EA0 96160354 7C71DD3F 94A87046 6AEA1A82 48C4DDE3 C9A5F153 
+  950855D4 2A30D49E 8B70199E FAD5C74E 480FAC73 6C60E01B 12DDEAAD 539C2746 
+  DEE1FE9A D4476CB5 C26241A8 7A47BF70 A537D80F 2F3F96CE C1397C11 756FBE17 
+  39CB61A1 79C83368 D395C3DD A9969BD0 C3ED
+  	quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+!
+license udi pid CSR1000V sn 9NBRYZ5Q065
+diagnostic bootup level minimal
+memory free low-watermark processor 71507
+!
+!
+spanning-tree extend system-id
+!
+username admin privilege 15 secret 9 $9$yrn11fEDxc/NME$NExWOL1Dt7L.x2ZaHLevyPeQVkcg1wLOCs3F9tORuAw
+!
+redundancy
+!
+bridge-domain 10 
+bridge-domain 11 
+bridge-domain 12 
+bridge-domain 13 
+!
+!
+!
+!
+!
+!
+track 8 ip sla 1 reachability
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback0
+ ip address 10.10.2.211 255.255.255.248
+ ip helper-address 10.10.2.165
+!
+interface Port-channel1
+ ip address 10.10.2.198 255.255.255.252
+ no negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface Port-channel2
+ ip address 10.10.2.202 255.255.255.252
+ no negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface Port-channel4
+ no ip address
+ no negotiation auto
+ no mop enabled
+ no mop sysid
+ service instance 10 ethernet
+  description 10.10.2.64/27 - HR - Vlan 10
+  encapsulation dot1q 10
+  bridge-domain 10
+ !
+ service instance 11 ethernet
+  description 10.10.2.96/27 - Accounting - Vlan 11
+  encapsulation dot1q 11
+  bridge-domain 11
+ !
+ service instance 12 ethernet
+  description 10.10.2.128/27 - Legal - Vlan 12
+  encapsulation dot1q 12
+  bridge-domain 12
+ !
+ service instance 13 ethernet
+  description 10.10.2.160/27 - IT - Vlan 13
+  encapsulation dot1q 13
+  bridge-domain 13
+ !
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+ channel-group 4 mode active
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+ channel-group 4 mode active
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+ channel-group 2 mode active
+!
+interface GigabitEthernet4
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+ channel-group 2 mode active
+!
+interface GigabitEthernet5
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+ channel-group 1 mode active
+!
+interface GigabitEthernet6
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+ channel-group 1 mode active
+!
+interface GigabitEthernet7
+ ip address 10.10.3.1 255.255.255.252
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet8
+ ip address 10.10.3.9 255.255.255.252
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet9
+ ip address 10.10.2.18 255.255.255.248
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet10
+ ip address 10.10.2.26 255.255.255.248
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet11
+ ip address 10.10.2.34 255.255.255.248
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet12
+ ip address 10.10.2.42 255.255.255.248
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet13
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet14
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet15
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet16
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet17
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet18
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet19
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet20
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface BDI10
+ ip address 10.10.2.67 255.255.255.224
+ ip helper-address 10.10.2.165
+ standby 10 ip 10.10.2.65
+ standby 10 timers msec 200 msec 750
+ standby 10 preempt delay minimum 2
+ standby 10 authentication md5 key-string Cisco123
+ encapsulation dot1Q 10
+ no mop enabled
+ no mop sysid
+!
+interface BDI11
+ ip address 10.10.2.99 255.255.255.224
+ ip helper-address 10.10.2.165
+ standby 11 ip 10.10.2.97
+ standby 11 timers msec 200 msec 750
+ standby 11 preempt delay minimum 350
+ standby 11 authentication md5 key-string Cisco123
+ standby 12 authentication md5 key-string Cisco123
+ standby 13 authentication md5 key-string Cisco123
+ encapsulation dot1Q 11
+ no mop enabled
+ no mop sysid
+!
+interface BDI12
+ ip address 10.10.2.131 255.255.255.224
+ ip helper-address 10.10.2.165
+ standby 12 ip 10.10.2.129
+ standby 12 timers msec 200 msec 750
+ standby 12 priority 110
+ standby 12 preempt delay minimum 350
+ standby 12 authentication md5 key-string Cisco123
+ encapsulation dot1Q 12
+ no mop enabled
+ no mop sysid
+!
+interface BDI13
+ ip address 10.10.2.163 255.255.255.224
+ ip helper-address 10.10.2.165
+ standby 13 ip 10.10.2.161
+ standby 13 timers msec 200 msec 750
+ standby 13 priority 110
+ standby 13 preempt delay minimum 350
+ standby 13 authentication md5 key-string Cisco123
+ encapsulation dot1Q 13
+ no mop enabled
+ no mop sysid
+!
+ip forward-protocol nd
+ip http server
+ip http authentication local
+ip http secure-server
+!
+ip route 0.0.0.0 0.0.0.0 10.10.2.210 track 8
+ip route 10.10.2.17 255.255.255.255 10.10.2.201
+ip route 10.10.2.25 255.255.255.255 10.10.2.201
+ip route 10.10.2.33 255.255.255.255 10.10.2.201
+ip route 10.10.2.41 255.255.255.255 10.10.2.201
+ip route 10.10.2.192 255.255.255.252 10.10.2.201
+ip route 10.10.2.192 255.255.255.252 10.10.2.25
+ip route 10.10.2.210 255.255.255.255 10.10.2.25
+ip route 10.10.2.225 255.255.255.255 10.10.2.197
+ip route 10.10.2.225 255.255.255.255 10.10.2.201 10
+ip route 192.168.1.0 255.255.255.0 10.10.2.197
+ip ssh version 2
+ip ssh pubkey-chain
+  username admin
+   key-hash ssh-rsa FD9F32D0FC2B17A5FC74E91B1EDEEBE6 alexa@Demidode
+   key-hash ssh-rsa 469C7B552CBABF4C8D43D95FED6CAC33 alexa@Degenerate
+ip ssh server algorithm authentication publickey
+ip scp server enable
+!
+!
+ip sla 1
+ icmp-echo 10.10.2.198 source-ip 10.10.2.27
+ip sla schedule 1 life forever start-time now
+!
+!
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line vty 0 4
+ login authentication SSH
+ transport input ssh
+!
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+ntp authentication-key 2 md5 096F471A1A0A4640582C 7
+ntp authentication-key 3 md5 01300F175804575D720F 7
+ntp authentication-key 4 md5 05280F1C22431F5B4A41 7
+ntp authentication-key 12 md5 02250D4808095E731F08 7
+ntp authentication-key 5 md5 032752180500701E1D4C 7
+ntp authentication-key 6 md5 13261E0108035578781A 7
+ntp authenticate
+ntp trusted-key 3
+ntp trusted-key 4
+ntp trusted-key 5
+ntp trusted-key 6
+ntp trusted-key 12
+ntp trusted-key 2
+ntp master 3
+ntp server 10.10.2.225
+ntp peer 10.10.2.201 key 12
+!
+!
+!
+!
+!
+end

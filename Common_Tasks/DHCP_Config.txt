@@ -1,0 +1,41 @@
+# a simple /etc/dhcp/dhcpd.conf
+default-lease-time 600;
+max-lease-time 7200;
+authoritative;
+	
+INTERFACESv4="ens2"
+
+#VLAN 10 - HR
+subnet 10.10.2.64 netmask 255.255.255.224 {
+ range 10.10.2.68  10.10.2.94;
+ option routers 10.10.2.66;
+ option domain-name-servers 192.168.1.1, 192.168.1.81;
+#option domain-name "cisco.com";
+}
+#VLAN 11 - Accounting
+subnet 10.10.2.96 netmask 255.255.255.224{
+ range 10.10.2.100 10.10.2.126;                           
+ option routers 10.10.2.97;                                
+ option domain-name-servers 192.168.1.1, 192.168.1.81;       
+#option domain-name "cisco.com";                       
+}           
+#VLAN 12 - Legal
+subnet 10.10.2.128 netmask 255.255.255.224{
+ range 10.10.2.132 10.10.2.158;                           
+ option routers 10.10.2.129;                                
+ option domain-name-servers 192.168.1.1, 192.168.1.81;       
+#option domain-name "cisco.com";                       
+}
+#VLAN 13 - IT
+subnet 10.10.2.165 netmask 255.255.255.224{                                       
+ range 10.10.2.165 10.10.2.190;                          
+ option routers 10.10.2.161;                               
+ option domain-name-servers 192.168.1.1, 192.168.1.81;       
+#option domain-name "cisco.com";                       
+}  
+
+# Create Static IP address for DHCP Server
+host UbuntuCiscoLabServer {
+hardware ethernet 52:54:00:13:df:30;
+fixed-address 10.10.2.164;
+}

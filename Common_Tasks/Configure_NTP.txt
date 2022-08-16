@@ -1,0 +1,219 @@
+Stratum level: -
+This column shows after synchronization where this router’s time stands in reliability scale. 
+If router is not connected with any NTP server or clock is not synchronized with any NTP source, 
+this column will always show value 16. If router is synchronized with any NTP source, 
+this column will display the stratum level of this router in NTP hierarchy. 
+Usually it remains one level down from NTP source unless it is modified manually.
+
+Key points
+    Stratum 0 represents atomic clock and not used in Cisco router
+    Stratum 1-15 are valid levels and used in Cisco router. 
+        1 is the most reliable and 15 is the worst (but still valid) NTP source.
+    Stratum 16 represents a situation where router is either not connected with any 
+    NTP source or not synchronized with any NTP server yet.
+    By default, after synchronization, router keeps its time one level down from NTP source or server. It allows us to build a proper hierarchy.
+    Default stratum level of router’s internal clock is 7.
+
+! NOTE: Can take up to 15 minutes for NTP to converge.
+
+! NTP Peering (active mode)
+    ! NTP Peers can mutually synchronize clocks with each other. 
+    ! NTP peering is usually configured where NTP devices with a low stratum number operate 
+    ! as backup for each other. In cases where one of the peers loses all connectivity with its 
+    ! primary NTP servers, the peer can synchronize its clock with the other peers. 
+    ! Peering must be configured on both peers. 
+
+! Multicast and Broadcast
+    ! If you have more than 20 network devices or a router that has limited 
+    ! system memory or CPU resources you might want to consider using NTP 
+    ! broadcast or multicast as it requires less resources. We can enable multicast
+    ! or broadcast on the interface level.
+    ! This is what it looks like:
+    ! Configure this on the Router/Switch that will act as the NTP source:
+        interface [RouterInt or Switch Vlan]
+            ntp multicast 239.1.1.1
+    ! Configure this on the NTP client Router/Switch:
+        interface [RouterInt or Switch Vlan]
+            ntp broadcast client 
+
+! Access-Control
+    ! First I will configure the CoreRouter so it only accepts one IP address as its NTP server. 
+    ! This is tricky since the IP address might change in the future, 
+    ! if you implement this on a production network you’ll have to make sure that you add all 
+    ! the possible IP address in the access-list:
+        CoreRouter(config)#access-list 1 permit 146.185.130.223
+        CoreRouter(config)#ntp access-group peer 1
+            ! The IP address above is what pool.ntp.org resolves to for me. 
+            ! The ntp access-group peer command is used to activate the access-list. 
+            ! SW1 and SW2 are the NTP clients for the CoreRouter but right now everyone 
+            ! can use our router as the NTP server. Let’s fix this so only SW1 and SW2 
+            ! are allowed as NTP clients:
+
+                ! CoreRouter(config)#ntp access-group serve-only 12
+                ! CoreRouter(config)#access-list 12 permit 192.168.123.1
+                ! CoreRouter(config)#access-list 12 permit 192.168.123.2
+        ! Problem solved, only SW1 and SW2 are now accepted as NTP clients. 
+        ! Our CoreRouter is now protected but let’s make some changes on SW1 and SW2 as well:
+            ! SW1(config)#access-list 3 permit 192.168.123.2
+            ! SW1(config)#access-list 3 permit 192.168.123.3
+            ! SW1(config)#ntp access-group peer 3
+            ! SW2(config)#access-list 3 permit 192.168.123.1
+            ! SW2(config)#access-list 3 permit 192.168.123.3
+            ! SW2(config)#ntp access-group peer 3
+        ! The configuration above allows SW1 and SW2 to use CoreRouter and each other as NTP server, 
+        ! no other sources are allowed.
+
+
+show ntp status 
+show ntp association
+debug ntp packet
+sh clock
+ntp source [Interface / hostname or IP address of NTP Source] ?
+clear timezone
+clear ntp server [Ip Address]
+set ntp client disable
+
+!The ntp update-calendar command will update the hardware clock with the time of the software clock:
+    ntp update-calendar
+    show calendar 
+
+
+Configure NTP Server on :
+    configure terminal
+    ip name-server 8.8.8.8
+    ntp server pool.ntp.org
+
+    ! Authentication. Each DistRouter will use a different key for authentication. 
+        ntp authenticate
+        ntp authentication-key 1 md5 Cisco123!
+        ntp authentication-key 2 md5 Cisco123@
+        ntp trusted-key 1
+        ntp trusted-key 2
+
+    interface loopback 0
+        ip address 10.10.100.1 255.255.255.0
+        no shutdown
+        ntp broadcast key 1
+        ntp broadcast key 2
+
+    ntp master 1
+    ntp server 1.1.1.1
+
+    clock timezone EST -5
+    clock summer-time EDT recurring
+
+DistRouter1 NTP Server/Client configuration:
+    ! Setup DistRouter to authenticate to the peer DistRouter
+    ntp authenticate
+    ntp authentication-key 1 md5 Cisco123#
+    ntp trusted-key 3
+    ntp server 10.10.2.210 key 1
+    ntp server 10.10.2.211 key 1
+    ntp authentication-key 3 md5 Cisco123#
+    ntp authentication-key 4 md5 Cisco123$
+    ntp authentication-key 5 md5 Cisco123%
+    ntp authentication-key 6 md5 Cisco123^
+    ntp trusted-key 4
+    ntp trusted-key 5
+    ntp trusted-key 6
+
+    ! Setup DistRouter to authenticate to the peer DistRouter
+        ntp authentication-key 12 md5 Cisco123&
+        ntp trusted-key 12
+        ntp peer 10.10.2.202 key 12 
+
+    int loopback 0
+        ntp broadcast key 3
+        ntp broadcast key 4
+        ntp broadcast key 5
+        ntp broadcast key 6
+        ntp broadcast key 12
+
+    clock timezone EST -5
+    clock summer-time EDT recurring
+
+DistRouter2 NTP Server/Client configuration:
+    ! Setup DistRouter to authenticate to the peer DistRouter
+    ntp authenticate
+    ntp authentication-key 2 md5 Cisco123#
+    ntp trusted-key 2
+    ntp server 10.10.2.210 key 2
+    ntp server 10.10.2.211 key 2
+    ntp authentication-key 3 md5 Cisco123#
+    ntp authentication-key 4 md5 Cisco123$
+    ntp authentication-key 5 md5 Cisco123%
+    ntp authentication-key 6 md5 Cisco123^
+    ntp trusted-key 4
+    ntp trusted-key 5
+    ntp trusted-key 6
+
+    ! Setup DistRouter to authenticate to the peer DistRouter
+    ntp authentication-key 12 md5 Cisco123&
+    ntp trusted-key 12
+    ntp peer 10.10.2.202 key 12 
+
+    clock timezone EST -5
+    clock summer-time EDT recurring
+
+    
+Configure NTP Client DistSwitch1:
+    ntp authenticate
+    ntp authentication-key 3 md5 Cisco123#
+    ntp trusted-key 3
+    ntp server 10.10.2.210 key 3
+    ntp server 10.10.2.211 key 3
+    ntp authentication-key 4 md5 Cisco123$
+    ntp authentication-key 5 md5 Cisco123%
+    ntp authentication-key 6 md5 Cisco123^
+    ntp trusted-key 4
+    ntp trusted-key 5
+    ntp trusted-key 6
+    ntp server 10.10.2.210 key 3
+    ntp server 10.10.2.211 key 3
+
+Configure NTP Client DistSwitch2:
+    ntp authenticate
+    ntp authentication-key 4 md5 Cisco123$
+    ntp trusted-key 4
+    ntp server 10.10.2.210 key 4
+    ntp server 10.10.2.211 key 4
+    ntp authentication-key 3 md5 Cisco123#
+    ntp authentication-key 5 md5 Cisco123%
+    ntp authentication-key 6 md5 Cisco123^
+    ntp trusted-key 3
+    ntp trusted-key 5
+    ntp trusted-key 6
+    ntp server 10.10.2.210 key 4
+    ntp server 10.10.2.211 key 4
+
+Configure NTP Client AccessSwitch1:
+    ntp authenticate
+    ntp authentication-key 5 md5 Cisco123%
+    ntp trusted-key 5
+    ntp server 10.10.2.210 key 5
+    ntp server 10.10.2.211 key 5
+    ntp authentication-key 3 md5 Cisco123#
+    ntp authentication-key 4 md5 Cisco123$
+    ntp authentication-key 6 md5 Cisco123^
+    ntp trusted-key 3
+    ntp trusted-key 4
+    ntp trusted-key 6
+    ntp server 10.10.2.210 key 5
+    ntp server 10.10.2.211 key 5
+
+Configure NTP Client AccessSwitch2:
+    ntp authenticate
+    ntp authentication-key 6 md5 Cisco123^
+    ntp trusted-key 6
+    ntp server 10.10.2.210 key 6
+    ntp server 10.10.2.211 key 6
+    ntp authentication-key 3 md5 Cisco123#
+    ntp authentication-key 4 md5 Cisco123$
+    ntp authentication-key 5 md5 Cisco123%
+    ntp trusted-key 3
+    ntp trusted-key 4
+    ntp trusted-key 5
+    ntp server 10.10.2.210 key 6
+    ntp server 10.10.2.211 key 6
+    
+

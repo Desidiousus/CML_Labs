@@ -1,0 +1,31 @@
+! Must configure VTP first if applicable
+
+conf t
+vtp mode [server/client]
+vtp ver 3
+vtp password [Password]
+vtp domain [DomainName]
+
+! NOTE: You have to enable MST AFTER you configure MSTP
+spanning-tree mst configuration
+	name MSTLab
+	instance 1 vlan 10,11
+	instance 2 vlan 12,13
+	revision 1
+	exit
+spanning-tree mode mst
+spanning-tree mst 1 root primary
+spanning-tree mst 2 root secondary
+
+Use the show spanning-tree mst configuration command to investigate the MST configuration on SW3.
+
+Use the show spanning-tree mst configuration digest to confirm that the Digest hash is 
+the same across all switches.
+
+show spanning-tree mst 1
+show spanning-tree mst 2
+
+Once the root bridge has been determined, an MST nonroot device uses this sequence to choose the best path to the root bridge:
+1.	Lowest root path cost
+2.	Lowest sender BID
+3.	Lowest sender Port_ID

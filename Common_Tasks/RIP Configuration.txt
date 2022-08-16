@@ -1,0 +1,22 @@
+! SOURCE: https://w7cloud.com/when-to-use-rip-routing-information-protocol/
+! Routing information protocol is most commonly deployed routing protocols, 
+! most of the operating windows, Linux and novel system use RIP. 
+! Routing information protocol is normally suitable for small office, 
+! medium office, branch office environment and flat networks. 
+! RIP is an interior routing protocol and used in inter-domain environment.  
+! RIP have following three versions:
+    ! 1. RIPv1 (version 1)
+    ! 2. RIPv2 (version 2, VLMS and authentication support)
+    ! 3. RIP NG (new generation, support IPV6)
+! Features:
+    ! RIP is distance vector routing protocol.
+    ! Administrative distance for RIP is 120 that is most highest among other dynamic routing protocols. Administrative distance represents how much a route is trusted, routing protocols with higher administrative distance are less trust among others. Support if a router has multiple paths to same destination, then router will prefer route with lowest administrative distance.       
+    ! Supports classless routing but RIPv2 also support VLSM’s
+    ! Subnet mask is included in route entry.
+    ! RIP use the Hop count for metric or choosing best path, path will less hop to a destination will be preferred in RIP.
+    ! RIP is suitable for small network and it support only 15 hop count and a route at 16 hops will be unreachable and inaccessible.
+    ! RIP send its routing updates every 30 seconds to multicast address 224.0.0.9
+    ! RIP supports authentication
+    ! RIP carry 25 routes in its routing updates and if you use authentication then 24 routes per RIP message.
+    ! RIP Uses UDP port 520.
+    ! RIP provides different mechanism  for avoiding loops in networks, these methods are split horizon, poison reverse and
